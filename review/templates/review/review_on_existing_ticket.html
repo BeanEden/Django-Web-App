@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Créer une critique</h2>
+    <form method="post" enctype="multipart/form-data">
+        <h4>Livre / Article</h4>
+            {% include 'ticket/ticket_snippet.html' with ticket=ticket %}
+        <h4>Critique</h4>
+            {{ review_form.as_p }}
+        {% csrf_token %}
+        <button type="submit" >Envoyer</button>
+    </form>
+{% endblock content %}

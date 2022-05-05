@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% load review_extras %}
+{% block content %}
+    <h2>Votre flux</h2>
+    <div class="grid-container">
+    {% for review in reviews %}
+        {% include 'review/review_snippet.html' with review=review %}
+{#        {% include 'ticket/ticket_snippet.html' with ticket=review.ticket %}#}
+    {% endfor %}
+    </div>
+{% endblock content %}

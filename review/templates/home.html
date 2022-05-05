@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load review_extras %}
+{% block content %}
+
+    <a href="{% url 'ticket_create' %}"><button>Demander une critique</button></a>
+    <a href="{% url 'review_and_ticket_creation' %}"><button>Créer une critique</button></a>
+    <h2>Votre flux</h2>
+    <div class="grid-container">
+        {% for instance in posts %}
+            {% if instance|model_type == 'Ticket' %}
+                {% include 'ticket/ticket_snippet.html' with ticket=instance %}
+            {% elif instance|model_type == 'Review' %}
+                {% include 'review/review_snippet.html' with review=instance %}
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endblock content %}

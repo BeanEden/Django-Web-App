@@ -1,0 +1,16 @@
+{% load review_extras %}
+    <a href="{% url 'ticket_view' ticket.id %}">
+        <div class="ticket-snippet">
+            <p>Vous avez publié un ticket</p>
+            <p>{{ ticket.time_created }}</p>
+                <h4>{{ ticket.titre }}</h4>
+            <p>{{ ticket.description }}</p>
+            <img src="{{ ticket.image.url }}">
+            <p>{{ ticket.review_associated }}</p>
+            <p>{{ ticket.user }}</p>
+            {% if ticket.review_associated == False %}
+                <a href="{% url 'review_on_existing_ticket' ticket.id %}"><button>Créer une critique</button></a>
+{#                {% include 'ticket/ticket_snippet.html' with ticket=ticket %}#}
+            {% endif %}
+        </div>
+    </a>
