@@ -3,12 +3,13 @@
     <a href="{% url 'review_view' review.id %}">
         <div class="review-snippet">
             <p>Vous avez publié une critique</p>
+
             <p>{{ review.time_created }}</p>
                 <h4>{{ review.headline }} - {{review.rating}}/5</h4>
             <p>{{ review.body }}</p>
             <p>{{ review.user }}</p>
             <p>{{ review.ticket }}</p>
-{#            {% include 'ticket/ticket_snippet.html' with ticket=review.ticket %}#}
+            {% include 'ticket/ticket_snippet.html' with ticket=review.ticket %}
 {#            <p>{{ review.ticket.id }}</p>#}
 {#            {% include 'ticket/ticket_snippet.html' with ticket=review.ticket %}#}
 {#            <p>{% url 'ticket_view' review.ticket.id %}</p>#}

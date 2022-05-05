@@ -25,9 +25,10 @@ def ticket_create(request):
         if form.is_valid():
             ticket = form.save(commit=False)
             # set the uploader to the user before saving the model
-            ticket.uploader = request.user
+            ticket.user = request.user
             # now we can save
             ticket.save()
+            ticket.contributors.add(request.user, through_defaults={'contribution': 'Auteur principal'})
             return redirect('home')
     return render(request, 'ticket/ticket_create.html', context={'form': form})
 
@@ -37,11 +38,10 @@ def ticket_edit(request, ticket_id):
     ticket = get_object_or_404(models.Ticket, id=ticket_id)
     edit_form = forms.TicketForm(instance=ticket)
     if request.method == 'POST':
-        if 'ticket_edit' in request.POST:
-            edit_form = forms.ReviewForm(request.POST, instance=ticket)
-            if edit_form.is_valid():
-                edit_form.save()
-                return redirect('home')
+        edit_form = forms.TicketForm(request.POST, instance=ticket)
+        if edit_form.is_valid():
+            edit_form.save()
+            return redirect('home')
     return render(request, 'ticket/ticket_edit.html', context={'edit_form': edit_form})
 
 
@@ -50,11 +50,8 @@ def ticket_delete(request, ticket_id):
     ticket = get_object_or_404(models.Ticket, id=ticket_id)
     delete_form = forms.DeleteBlogForm()
     if request.method == 'POST':
-        if 'ticket_delete' in request.POST:
-            delete_form = forms.DeleteBlogForm(request.POST)
-            if delete_form.is_valid():
-                ticket.delete()
-                return redirect('home')
+        ticket.delete()
+        return redirect('home')
     context = {'delete_form': delete_form,
                'ticket': ticket, }
     return render(request, 'ticket/ticket_delete.html', context=context)
@@ -77,8 +74,7 @@ def review_create(request):
     form = forms.ReviewForm()
     if request.method == 'POST':
         form = forms.ReviewForm(request.POST, request.FILES)
-        # if ticket
-        #     ticket_form = forms.TicketForm()
+
         if form.is_valid():
             review = form.save(commit=False)
             # set the uploader to the user before saving the model
@@ -100,26 +96,24 @@ def review_edit(request, review_id):
     review = get_object_or_404(models.Review, id=review_id)
     edit_form = forms.ReviewForm(instance=review)
     if request.method == 'POST':
-        if 'review_edit' in request.POST:
-            edit_form = forms.ReviewForm(request.POST, instance=review)
-            if edit_form.is_valid():
-                edit_form.save()
-                return redirect('home')
+        edit_form = forms.ReviewForm(request.POST, instance=review)
+        if edit_form.is_valid():
+            edit_form.save()
+            return redirect('home')
     context ={'review': review, 'edit_form':edit_form}
     return render(request, 'review/review_edit.html', context=context)
 
 
 @login_required
 def review_delete(request, review_id):
-    review = get_object_or_404(models.Ticket, id=review_id)
+    review = get_object_or_404(models.Review, id=review_id)
     delete_form = forms.DeleteBlogForm()
     if request.method == 'POST':
-        if 'review_delete' in request.POST:
-            delete_form = forms.DeleteBlogForm(request.POST)
-            if delete_form.is_valid():
-                review.delete()
-                return redirect('home')
-    context = {'review':review, 'delete_form': delete_form}
+        review.delete()
+        review.ticket.review_associated = False
+        review.ticket.save()
+        return redirect('home')
+    context = {'review': review, 'delete_form': delete_form}
     return render(request, 'review/review_delete.html', context=context)
 
 
@@ -138,7 +132,7 @@ def review_and_ticket_creation(request):
         ticket_form = forms.TicketForm(request.POST, request.FILES)
         if all([review_form.is_valid(), ticket_form.is_valid()]):
             ticket = ticket_form.save(commit=False)
-            ticket.uploader = request.user
+            ticket.user = request.user
             ticket.review_done()
             ticket.save()
             review = review_form.save(commit=False)

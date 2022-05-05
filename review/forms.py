@@ -29,7 +29,7 @@ class FollowUsersForm(forms.ModelForm):
         fields = ['follows']
 
 
-class FollowedUsersForm(forms.ModelForm):
-    class Meta:
-        model = models.FollowedUsers
-        fields = ['user_name']
+# class FollowedUsersForm(forms.ModelForm):
+#     class Meta:
+#         model = models.FollowedUsers
+#         fields = ['user_name']

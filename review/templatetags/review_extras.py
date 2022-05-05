@@ -28,3 +28,9 @@ def get_poster_display(context, user):
     if user == context['user']:
         return 'vous'
     return user.username
+
+@register.simple_tag(takes_context=True)
+def check_user(context, user):
+    if user == context['user']:
+        return True
+    return user.username
