@@ -1,20 +1,17 @@
 {% load review_extras %}
 {% block content %}
-    <a href="{% url 'review_view' review.id %}">
-        <div class="review-snippet">
-            <p>Vous avez publié une critique</p>
-
-            <p>{{ review.time_created }}</p>
-                <h4>{{ review.headline }} - {{review.rating}}/5</h4>
-            <p>{{ review.body }}</p>
-            <p>{{ review.user }}</p>
-            <p>{{ review.ticket }}</p>
+    <a href="{% url 'review_view' review.id %}"></a>
+        <div class="snippet">
+            <p class = "intro">Vous avez publié une critique</p>
+            <p class = "date">{{ review.time_created }}</p>
+                <h3 class = "titre">{{ review.headline }} - {{review.rating}}/5</h3>
+            <p class="text">{{ review.body }}</p>
             {% include 'ticket/ticket_snippet.html' with ticket=review.ticket %}
-{#            <p>{{ review.ticket.id }}</p>#}
-{#            {% include 'ticket/ticket_snippet.html' with ticket=review.ticket %}#}
-{#            <p>{% url 'ticket_view' review.ticket.id %}</p>#}
+        {% if user == review.user %}
+            <div class = "edit-button">
             <a href="{% url 'review_edit' review.id %}"><button>Modifier</button></a>
             <a href="{% url 'review_delete' review.id %}"><button>Supprimer</button></a>
+            </div>
+                    {% endif %}
         </div>
-    </a>
 {% endblock content %}

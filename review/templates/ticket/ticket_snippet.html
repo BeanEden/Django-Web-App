@@ -1,21 +1,20 @@
 {% load review_extras %}
-    <a href="{% url 'ticket_view' ticket.id %}">
-        <div class="ticket-snippet">
-            <p>Vous avez publié un ticket</p>
-            <p>{{ ticket.time_created }}</p>
-                <h4>{{ ticket.titre }}</h4>
-            <p>{{ ticket.description }}</p>
-            <img src="{{ ticket.image.url }}">
-            <p>{{ ticket.review_associated }}</p>
-            <p>{{ ticket.user }}</p>
-            {% if user == ticket.user %}
-                 <a href="{% url 'ticket_edit' ticket.id %}"><button>Modifier</button></a>
-                <a href="{% url 'ticket_delete' ticket.id %}"><button>Supprimer</button></a>
-                        {% endif %}
-                {% if ticket.review_associated == False %}
+        <div class="snippet">
+        <a href="{% url 'ticket_view' ticket.id %}"></a>
+            <p class = "intro">Vous avez publié un ticket</p>
+            <p class = "date">{{ ticket.time_created }}</p>
+            <h3 class = "titre">{{ ticket.titre }}</h3>
+            <p class="text">{{ ticket.description }}</p>
+            <img class = "book-cover" src="{{ ticket.image.url }}">
+        {% if user == ticket.user %}
+            <div class = "edit-button">
+                <a class = "edit-button" href="{% url 'ticket_edit' ticket.id %}"><button>Modifier</button></a>
+                <a class = "edit-button" href="{% url 'ticket_delete' ticket.id %}"><button>Supprimer</button></a>
+            </div>
+        {% endif %}
+        {% if ticket.review_associated == False %}
+            <div class="review-button">
                 <a href="{% url 'review_on_existing_ticket' ticket.id %}"><button>Créer une critique</button></a>
-{#                {% include 'ticket/ticket_snippet.html' with ticket=ticket %}#}
-
-            {% endif %}
+            </div>
+        {% endif %}
         </div>
-    </a>

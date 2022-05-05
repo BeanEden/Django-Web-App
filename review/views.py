@@ -78,7 +78,7 @@ def review_create(request):
         if form.is_valid():
             review = form.save(commit=False)
             # set the uploader to the user before saving the model
-            review.uploader = request.user
+            review.user = request.user
             # now we can save
             review.save()
             return redirect('home')
@@ -136,7 +136,7 @@ def review_and_ticket_creation(request):
             ticket.review_done()
             ticket.save()
             review = review_form.save(commit=False)
-            review.author = request.user
+            review.user = request.user
             review.ticket = ticket
             review.save()
             return redirect('home')
@@ -157,7 +157,7 @@ def review_on_existing_ticket(request, ticket_id):
             ticket.review_associated = True
             ticket.save()
             review = review_form.save(commit=False)
-            review.author = request.user
+            review.user = request.user
             review.ticket = ticket
             review.save()
             return redirect('home')
