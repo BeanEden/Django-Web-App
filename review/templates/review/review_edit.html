@@ -9,10 +9,6 @@
         <button type="submit" >Sauvegarder</button>
     </form>
     <hr>
-    <h3>Supprimer le ticket ?</h3>
-    <form method="post">
-        {{ delete_form }}
-        {% csrf_token %}
-        <button type="submit" >Supprimer</button>
-    </form>
+    <h3>Supprimer la critique ?</h3>
+    <a href="{% url 'review_delete' review.id %}"><button>Supprimer</button></a>
 {% endblock content %}

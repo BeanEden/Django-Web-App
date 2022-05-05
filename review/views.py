@@ -105,7 +105,8 @@ def review_edit(request, review_id):
             if edit_form.is_valid():
                 edit_form.save()
                 return redirect('home')
-    return render(request, 'review/review_edit.html', context={'edit_form': edit_form})
+    context ={'review': review, 'edit_form':edit_form}
+    return render(request, 'review/review_edit.html', context=context)
 
 
 @login_required
@@ -118,7 +119,8 @@ def review_delete(request, review_id):
             if delete_form.is_valid():
                 review.delete()
                 return redirect('home')
-    return render(request, 'review/review_delete.html', context={'delete_form': delete_form})
+    context = {'review':review, 'delete_form': delete_form}
+    return render(request, 'review/review_delete.html', context=context)
 
 
 @login_required
