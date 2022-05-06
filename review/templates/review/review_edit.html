@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
     <h2>Modifier la critique n°{{review.id}}</h2>
+        <div class="snippet">
     <p>En réponse au ticket suivant :</p>
         {% include 'ticket/ticket_snippet.html' with ticket=review.ticket %}
     <form method="post">
@@ -11,4 +12,5 @@
     <hr>
     <h3>Supprimer la critique ?</h3>
     <a href="{% url 'review_delete' review.id %}"><button>Supprimer</button></a>
+        </div>
 {% endblock content %}

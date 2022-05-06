@@ -77,3 +77,10 @@ class ReviewContributor(models.Model):
     class Meta:
         unique_together = ('user', 'review')
 
+class UserFollowing(models.Model):
+    user_id = models.ForeignKey("User", related_name="following")
+
+    following_user_id = models.ForeignKey("User", related_name="followers")
+
+    # You can even add info about when user started following
+    created = models.DateTimeField(auto_now_add=True)

@@ -3,7 +3,11 @@
     <h2>Suivre des utilisateurs</h2>
     <form method="post">
         {{ form.as_p }}
+        {{ followed.as_p }}
         {% csrf_token %}
         <button type="submit" >Confirmer</button>
     </form>
+{#    {% for user_followed in followed %}#}
+{#     <p>1</p>#}
+{#    {% endfor %}#}
 {% endblock content %}

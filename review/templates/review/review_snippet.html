@@ -1,10 +1,13 @@
 {% load review_extras %}
-{% block content %}
+    <div class="snippet">
     <a href="{% url 'review_view' review.id %}"></a>
-        <div class="snippet">
-            <p class = "intro">Vous avez publié une critique</p>
+            <p class = "intro">{% get_poster_display_review review.user %} publié une critique</p>
             <p class = "date">{{ review.time_created }}</p>
-                <h3 class = "titre">{{ review.headline }} - {{review.rating}}/5</h3>
+                <h3 class = "titre">{{ review.headline }} -
+                    {% for item in "x"|ljust:review.rating %}
+                        <span class="fa fa-star checked"></span>
+                    {% endfor %}
+                </h3>
             <p class="text">{{ review.body }}</p>
             {% include 'ticket/ticket_snippet.html' with ticket=review.ticket %}
         {% if user == review.user %}
@@ -12,6 +15,5 @@
             <a href="{% url 'review_edit' review.id %}"><button>Modifier</button></a>
             <a href="{% url 'review_delete' review.id %}"><button>Supprimer</button></a>
             </div>
-                    {% endif %}
+        {% endif %}
         </div>
-{% endblock content %}

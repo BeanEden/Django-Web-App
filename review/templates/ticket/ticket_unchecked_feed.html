@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Tickets en attente</h2>
+    <div class="grid-container">
+    {% for ticket in tickets %}
+        {% if ticket.review_associated == False %}
+            {% include 'ticket/ticket_snippet.html' with ticket=ticket %}
+        {% endif %}
+    {% endfor %}
+    </div>
+{% endblock content %}

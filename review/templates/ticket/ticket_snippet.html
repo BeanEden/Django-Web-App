@@ -1,7 +1,7 @@
 {% load review_extras %}
         <div class="snippet">
         <a href="{% url 'ticket_view' ticket.id %}"></a>
-            <p class = "intro">Vous avez publié un ticket</p>
+            <p class = "intro">{% get_poster_display ticket.user %} publié un ticket</p>
             <p class = "date">{{ ticket.time_created }}</p>
             <h3 class = "titre">{{ ticket.titre }}</h3>
             <p class="text">{{ ticket.description }}</p>

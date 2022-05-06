@@ -26,13 +26,16 @@ urlpatterns = [
 
     path('home/', review.views.home, name='home'),
     path('follow_users/', review.views.follow_users, name='follow_users'),
-    path('posts/', review.views.posts, name='posts'),
+    path('followed_user_feed/', review.views.followed_user_feed, name='followed_user_feed'),
+    path('user_feed/', review.views.user_feed, name='user_feed'),
+
 
     path('ticket/create/', review.views.ticket_create, name='ticket_create'),
     path('ticket/<int:ticket_id>/edit/', review.views.ticket_edit, name='ticket_edit'),
     path('ticket/<int:ticket_id>/delete/', review.views.ticket_delete, name='ticket_delete'),
     path('ticket/<int:ticket_id>', review.views.ticket_view, name='ticket_view'),
     path('ticket_feed/', review.views.ticket_feed, name='ticket_feed'),
+    path('ticket_unchecked_feed/', review.views.ticket_unchecked_feed, name='ticket_unchecked_feed'),
 
     path('review/create/', review.views.review_create, name='review_create'),
     path('review/create_with_ticket/', review.views.review_and_ticket_creation, name='review_and_ticket_creation'),
@@ -41,6 +44,7 @@ urlpatterns = [
     path('review/<int:review_id>/delete/', review.views.review_delete, name='review_delete'),
     path('review/<int:review_id>', review.views.review_view, name='review_view'),
     path('review_feed/', review.views.review_feed, name='review_feed')
+
 ]
 
 # path('follow-users/', review.views.follow_users, name='follow_users')

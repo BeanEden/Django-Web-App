@@ -12,6 +12,9 @@ register = template.Library()
 def model_type(value):
     return type(value).__name__
 
+@register.filter
+def rating_value(rating):
+    return int(rating)
 
 @register.filter
 def get_posted_at_display(posted_at):
@@ -26,8 +29,14 @@ def get_posted_at_display(posted_at):
 @register.simple_tag(takes_context=True)
 def get_poster_display(context, user):
     if user == context['user']:
-        return 'vous'
-    return user.username
+        return 'Vous avez'
+    return user.username +" a "
+
+@register.simple_tag(takes_context=True)
+def get_poster_display_review(context, user):
+    if user == context['user']:
+        return 'Vous avez'
+    return str(user) + " a "
 
 @register.simple_tag(takes_context=True)
 def check_user(context, user):

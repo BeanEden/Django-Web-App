@@ -5,7 +5,7 @@
     <a href="{% url 'ticket_create' %}"><button>Demander une critique</button></a>
     <a href="{% url 'review_and_ticket_creation' %}"><button>Créer une critique</button></a>
     </div>
-    <h2>Derniers posts</h2>
+    <h2>Vos derniers posts</h2>
     <div class="feed">
         {% for instance in posts %}
             {% if instance|model_type == 'Ticket' %}
@@ -13,6 +13,7 @@
             {% elif instance|model_type == 'Review' %}
                 {% include 'review/review_snippet.html' with review=instance %}
             {% endif %}
+
         {% endfor %}
     </div>
 {% endblock content %}

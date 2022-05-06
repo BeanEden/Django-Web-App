@@ -1,17 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
     <h2>Modifier le ticket</h2>
+    <div class="snippet">
     <form method="post">
         {{ edit_form.as_p }}
         {% csrf_token %}
         <img src="{{ ticket.image.url }}">
         <button type="submit" >Sauvegarder</button>
     </form>
-    <hr>
     <h3>Supprimer le billet ?</h3>
     <form method="post">
         {{ delete_form }}
         {% csrf_token %}
         <button type="submit" >Supprimer</button>
     </form>
+</div>
 {% endblock content %}

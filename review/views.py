@@ -16,6 +16,20 @@ def home(request):
     posts = sorted(chain(reviews, tickets), key=lambda x: x.time_created, reverse=True)
     return render(request, 'home.html', context={'posts': posts})
 
+@login_required
+def user_feed(request):
+    reviews = models.Review.objects.all()
+    tickets = models.Ticket.objects.all()
+    posts = sorted(chain(reviews, tickets), key=lambda x: x.time_created, reverse=True)
+    return render(request, 'user_feed.html', context={'posts': posts})
+
+@login_required
+def followed_user_feed(request):
+    reviews = models.Review.objects.filter(user__in=request.user.follows.all())
+    tickets = models.Ticket.objects.filter(user__in=request.user.follows.all())
+    posts = sorted(chain(reviews, tickets), key=lambda x: x.time_created, reverse=True)
+    return render(request, 'followed_user_feed.html', context={'posts': posts})
+
 
 @login_required
 def ticket_create(request):
@@ -67,6 +81,11 @@ def ticket_view(request, ticket_id):
 def ticket_feed(request):
     tickets = models.Ticket.objects.all()
     return render(request, 'ticket/ticket_feed.html', context={'tickets': tickets})
+
+@login_required
+def ticket_unchecked_feed(request):
+    tickets = models.Ticket.objects.all()
+    return render(request, 'ticket/ticket_unchecked_feed.html', context={'tickets': tickets})
 
 
 @login_required
@@ -171,12 +190,16 @@ def review_on_existing_ticket(request, ticket_id):
 @login_required
 def follow_users(request):
     form = forms.FollowUsersForm(instance=request.user)
+    followed = forms.UserFollowsForm.objects.create(user_id=request.user,
+                                 following_user_id=follow.id)
     if request.method == 'POST':
         form = forms.FollowUsersForm(request.POST, instance=request.user)
+        followed = forms.UserFollowsForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
             return redirect('home')
-    return render(request, 'follow_users.html', context={'form': form})
+    context = {'form': form, 'followed': followed}
+    return render(request, 'follow_users.html', context=context)
 
 
 def posts(request):
