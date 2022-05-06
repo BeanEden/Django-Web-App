@@ -42,7 +42,6 @@ def ticket_create(request):
             ticket.user = request.user
             # now we can save
             ticket.save()
-            ticket.contributors.add(request.user, through_defaults={'contribution': 'Auteur principal'})
             return redirect('home')
     return render(request, 'ticket/ticket_create.html', context={'form': form})
 
@@ -187,20 +186,35 @@ def review_on_existing_ticket(request, ticket_id):
     return render(request, 'review/review_on_existing_ticket.html', context=context)
 
 
+# @login_required
+# def follow_users(request):
+#     form = forms.FollowUsersForm(instance=request.user)
+#     followed = forms.FollowUsersForm(instance=request.user)
+#     followers = request.user.follows.all()
+#     if request.method == 'POST':
+#         form = forms.FollowUsersForm(request.POST, instance=request.user)
+#         followed = forms.UserFollowsForm(request.POST, instance=request.user)
+#         if form.is_valid():
+#             form.save()
+#             # followed.save()
+#             return redirect('home')
+#     context = {'form': form, 'followed': followed, 'followers': followers}
+#     return render(request, 'follow_users.html', context=context)
+
+
 @login_required
 def follow_users(request):
-    form = forms.FollowUsersForm(instance=request.user)
-    followed = forms.UserFollowsForm.objects.create(user_id=request.user,
-                                 following_user_id=follow.id)
+    followed = forms.UserFollowsForm(instance=request.user)
+    followers = request.user.follows.all()
     if request.method == 'POST':
         form = forms.FollowUsersForm(request.POST, instance=request.user)
         followed = forms.UserFollowsForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
+            # followed.save()
             return redirect('home')
-    context = {'form': form, 'followed': followed}
+    context = {'followed': followed, 'followers': followers}
     return render(request, 'follow_users.html', context=context)
-
 
 def posts(request):
     form = forms.FollowUsersForm(request.POST, instance=request.user)

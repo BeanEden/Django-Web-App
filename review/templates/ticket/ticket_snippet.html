@@ -5,7 +5,8 @@
             <p class = "date">{{ ticket.time_created }}</p>
             <h3 class = "titre">{{ ticket.titre }}</h3>
             <p class="text">{{ ticket.description }}</p>
-            <img class = "book-cover" src="{{ ticket.image.url }}">
+        <img class = "book-cover" src="{{ ticket.image.url }}">
+{#            <p>{{ ticket.image }}</p>#}
         {% if user == ticket.user %}
             <div class = "edit-button">
                 <a class = "edit-button" href="{% url 'ticket_edit' ticket.id %}"><button>Modifier</button></a>
