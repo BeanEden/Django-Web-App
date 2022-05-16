@@ -14,7 +14,11 @@ def home(request):
     reviews = models.Review.objects.all()
     tickets = models.Ticket.objects.all()
     posts = sorted(chain(reviews, tickets), key=lambda x: x.time_created, reverse=True)
-    return render(request, 'home.html', context={'posts': posts})
+    paginator = Paginator(posts, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context = {'page_obj': page_obj}
+    return render(request, 'home.html', context=context)
 
 @login_required
 def user_feed(request):
@@ -24,11 +28,11 @@ def user_feed(request):
     return render(request, 'user_feed.html', context={'posts': posts})
 
 @login_required
-def followed_user_feed(request):
-    reviews = models.Review.objects.filter(user__in=request.user.follows.all())
-    tickets = models.Ticket.objects.filter(user__in=request.user.follows.all())
+def followed_feed(request):
+    reviews = models.Review.objects.filter(user__in=request.user.abonnements.all())
+    tickets = models.Ticket.objects.filter(user__in=request.user.abonnements.all())
     posts = sorted(chain(reviews, tickets), key=lambda x: x.time_created, reverse=True)
-    return render(request, 'followed_user_feed.html', context={'posts': posts})
+    return render(request, 'followed_feed.html', context={'posts': posts})
 
 
 @login_required
@@ -92,7 +96,6 @@ def review_create(request):
     form = forms.ReviewForm()
     if request.method == 'POST':
         form = forms.ReviewForm(request.POST, request.FILES)
-
         if form.is_valid():
             review = form.save(commit=False)
             # set the uploader to the user before saving the model
@@ -118,7 +121,7 @@ def review_edit(request, review_id):
         if edit_form.is_valid():
             edit_form.save()
             return redirect('home')
-    context ={'review': review, 'edit_form':edit_form}
+    context = {'review': review, 'edit_form': edit_form}
     return render(request, 'review/review_edit.html', context=context)
 
 
@@ -204,18 +207,49 @@ def review_on_existing_ticket(request, ticket_id):
 
 @login_required
 def follow_users(request):
-    followed = forms.UserFollowsForm(instance=request.user)
-    followers = request.user.follows.all()
+    followed_form = forms.UserFollowsForm(instance=request.user)
     if request.method == 'POST':
-        form = forms.FollowUsersForm(request.POST, instance=request.user)
-        followed = forms.UserFollowsForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.save()
-            # followed.save()
-            return redirect('home')
-    context = {'followed': followed, 'followers': followers}
+        # form = forms.FollowUsersForm(request.POST, instance=request.user)
+        followed_form = forms.UserFollowsForm(request.POST, instance=request.user)
+        if followed_form.is_valid():
+            followed_form.save()
+            return redirect('follow_users')
+    context = {'followed_form': followed_form}
     return render(request, 'follow_users.html', context=context)
+
+
+@login_required
+def users_followed_feed(request):
+    followed_form = forms.UserFollowsForm(instance=request.user)
+    if request.method == 'POST':
+        # form = forms.FollowUsersForm(request.POST, instance=request.user)
+        followed_form = forms.UserFollowsForm(request.POST, instance=request.user)
+        if followed_form.is_valid():
+            followed_form.save()
+            return redirect('users_followed_feed')
+    users_followed = models.UserFollows.objects.all()
+    context = {'followed_form': followed_form, 'users_followed': users_followed}
+    return render(request, 'users_followed_feed.html', context=context)
+
 
 def posts(request):
     form = forms.FollowUsersForm(request.POST, instance=request.user)
     return render(request, 'review/posts.html', context={'form': form})
+
+
+# user_searched = models.UserFollows.objects.filter(
+#         Q(contributors__in=request.user.follows.all()) | Q(starred=True))
+
+
+# def followToggle(request, author):
+#     authorObj = User.objects.get(username=author)
+#     currentUserObj = User.objects.get(username=request.user.username)
+#     following = authorObj.following.all()
+#
+#     if author != currentUserObj.username:
+#         if currentUserObj in following:
+#             authorObj.following.remove(currentUserObj.id)
+#         else:
+#             authorObj.following.add(currentUserObj.id)
+#
+#     return HttpResponseRedirect(reverse(profile, args=[authorObj.username]))

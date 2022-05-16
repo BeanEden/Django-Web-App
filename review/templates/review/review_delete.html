@@ -2,9 +2,11 @@
 {% block content %}
     <h2>Supprimer la critique ?</h2>
     {% include 'review/review_snippet.html' with ticket=ticket %}
+    <div class="submit-form">
     <form method="post" enctype="multipart/form-data">
         {{ delete_form }}
         {% csrf_token %}
         <button type="submit" >Supprimer</button>
     </form>
+    </div>
 {% endblock content %}

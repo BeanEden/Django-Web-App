@@ -1,15 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
     <h2>Suivre des utilisateurs</h2>
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
 {#        {{ form.as_p }}#}
         {{ followed_form.as_p }}
         {% csrf_token %}
         <button type="submit" >Confirmer</button>
     </form>
     <h3>Abonnements</h3>
-    {% for follow in following %}
+    <p>{{users_followed}}</p>
+    {% for follow in users_followed %}
+        {% if user == follow.user %}
         {% include 'unfollow_button.html' %}
+        {% endif %}
     {% endfor %}
     <h3>Abonnés</h3>
 {#    {% for user_followed in followed %}#}
