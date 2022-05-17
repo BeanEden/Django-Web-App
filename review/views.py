@@ -227,6 +227,9 @@ def users_followed_feed(request):
         if followed_form.is_valid():
             followed_form.save()
             return redirect('users_followed_feed')
+    if request.method == 'GET':  # If the form is submitted
+        search_query = request.GET.get('search_box', None)
+
     users_followed = models.UserFollows.objects.all()
     context = {'followed_form': followed_form, 'users_followed': users_followed}
     return render(request, 'users_followed_feed.html', context=context)
@@ -236,7 +239,26 @@ def posts(request):
     form = forms.FollowUsersForm(request.POST, instance=request.user)
     return render(request, 'review/posts.html', context={'form': form})
 
+def user_delete (request, user_follows_id):
+    user_followed = models.UserFollows.objects.all()
+    user_followed = get_object_or_404(models.UserFollows, id=user_follows_id)
+    user_follows = user_followed.followed_user
+    reviews = models.Review.objects.filter(user__in=request.user.abonnements.all())
+    # tickets = models.Ticket.objects.filter(user=user_id)
+    # posts = sorted(chain(reviews, tickets), key=lambda x: x.time_created, reverse=True)
+    delete_form = forms.DeleteBlogForm()
+    if request.method == 'POST':
+        user_followed.delete()
+        return redirect('home')
+    context = {'user_followed': user_followed, 'user_follows': user_follows, 'posts': posts, 'delete_form': delete_form}
+    return render(request, 'user_delete.html', context=context)
 
+@login_required
+def specific_user_delete(request,user_id):
+    reviews = models.Review.objects.all()
+    tickets = models.Ticket.objects.all()
+    posts = sorted(chain(reviews, tickets), key=lambda x: x.time_created, reverse=True)
+    return render(request, 'user_feed.html', context={'posts': posts})
 # user_searched = models.UserFollows.objects.filter(
 #         Q(contributors__in=request.user.follows.all()) | Q(starred=True))
 

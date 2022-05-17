@@ -3,6 +3,7 @@ from django.db import models
 from PIL import Image
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+
 class Ticket(models.Model):
     titre = models.CharField(max_length=128)
     description = models.TextField(max_length=2048, blank=True)

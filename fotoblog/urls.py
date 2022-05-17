@@ -29,12 +29,12 @@ urlpatterns = [
     path('followed_feed/', review.views.followed_feed, name='followed_feed'),
     path('user_feed/', review.views.user_feed, name='user_feed'),
     path('users_followed_feed/', review.views.users_followed_feed, name='users_followed_feed'),
-
+    path('user_delete/<int:user_follows_id>/', review.views.user_delete, name='user_delete'),
 
     path('ticket/create/', review.views.ticket_create, name='ticket_create'),
     path('ticket/<int:ticket_id>/edit/', review.views.ticket_edit, name='ticket_edit'),
     path('ticket/<int:ticket_id>/delete/', review.views.ticket_delete, name='ticket_delete'),
-    path('ticket/<int:ticket_id>', review.views.ticket_view, name='ticket_view'),
+    path('ticket/<int:ticket_id>/', review.views.ticket_view, name='ticket_view'),
     path('ticket_feed/', review.views.ticket_feed, name='ticket_feed'),
     path('ticket_unchecked_feed/', review.views.ticket_unchecked_feed, name='ticket_unchecked_feed'),
 

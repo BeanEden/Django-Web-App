@@ -8,10 +8,13 @@
         <button type="submit" >Confirmer</button>
     </form>
     <h3>Abonnements</h3>
-    {% for follow in following %}
-        {% include 'unfollow_button.html' %}
+    {% for follow in azq%}
+        {% include 'followed_snippet.html' %}
     {% endfor %}
     <h3>Abonnés</h3>
+    {% for followers in following %}
+        {% include 'followed_snippet.html' %}
+    {% endfor %}
 {#    {% for user_followed in followed %}#}
 {#     <p>1</p>#}
 {#    {% endfor %}#}
