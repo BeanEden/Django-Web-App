@@ -1,7 +1,7 @@
 from itertools import chain
 
 from django.contrib.auth.decorators import login_required, permission_required
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.forms import formset_factory
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -14,8 +14,14 @@ from . import forms, models
 # from authentication.models import User
 from django.contrib.auth import get_user_model
 
-User = get_user_model()
+from django.views import View
+from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
 
+User = get_user_model()
+paginate_by = 6
 
 class GlobalFeed(LoginRequiredMixin, View):
     template_name = ''
@@ -128,9 +134,6 @@ class ReviewViewAndEdit(LoginRequiredMixin, View):
             return redirect('home')
 
 
-
-
-
 class DeleteView(LoginRequiredMixin, View):
     template_name = ''
     review_id = ''
@@ -154,31 +157,6 @@ class DeleteView(LoginRequiredMixin, View):
         self.review.ticket.review_associated = False
         self.review.ticket.save()
         return redirect('home')
-
-
-@login_required
-def review_and_ticket_creation(request):
-    review_form = forms.ReviewForm()
-    ticket_form = forms.TicketForm()
-    if request.method == 'POST':
-        review_form = forms.ReviewForm(request.POST)
-        ticket_form = forms.TicketForm(request.POST, request.FILES)
-        if all([review_form.is_valid(), ticket_form.is_valid()]):
-            ticket = ticket_form.save(commit=False)
-            ticket.user = request.user
-            ticket.review_done()
-            ticket.save()
-            review = review_form.save(commit=False)
-            review.user = request.user
-            review.ticket = ticket
-            review.save()
-            return redirect('home')
-    context = {
-        'review_form': review_form,
-        'ticket_form': ticket_form,
-    }
-    return render(request, 'review/review_and_ticket_creation.html', context=context)
-
 
 
 
@@ -228,27 +206,46 @@ def users_followed_feed(request):
 
 
 
-class FilmBaseView(View):
-    model = Film
+class TicketBaseView(View):
+    model = models.Ticket
     fields = '__all__'
-    success_url = reverse_lazy('films:all')
+    success_url = reverse_lazy('home')
 
-class FilmListView(FilmBaseView, ListView):
-    """View to list all films.
-    Use the 'film_list' variable in the template
-    to access all Film objects"""
+class TicketListView(LoginRequiredMixin, TicketBaseView, ListView):
+    template_name = ''
 
-class FilmDetailView(FilmBaseView, DetailView):
-    """View to list the details from one film.
-    Use the 'film' variable in the template to access
-    the specific film here and in the Views below"""
 
-class FilmCreateView(FilmBaseView, CreateView):
-    """View to create a new film"""
+    def get_context_data(self, **kwargs):
+        context = super(TicketListView, self).get_context_data(**kwargs)
+        tickets = self.get_queryset()
+        page = self.request.GET.get('page')
+        paginator = Paginator(tickets, self.paginate_by)
+        try:
+            tickets = paginator.page(page)
+        except PageNotAnInteger:
+            tickets = paginator.page(1)
+        except EmptyPage:
+            tickets = paginator.page(paginator.num_pages)
+        context['tickets'] = tickets
+        return context
 
-class FilmUpdateView(FilmBaseView, UpdateView):
-    """View to update a film"""
+class TicketCreateView(LoginRequiredMixin, TicketBaseView, CreateView):
+    template_name = 'ticket/ticket_create.html'
+    form = forms.TicketForm()
 
-class FilmDeleteView(FilmBaseView, DeleteView):
-    """View to delete a film"""
+
+# class FilmDetailView(TicketBaseView, DetailView):
+#     template_name = ""
+#     def get_object(self):
+#         id_ = self.kwargs.get("id")
+#         return get_object_or_404(self.Ticket, id=id_
+#
+# class FilmCreateView(TicketBaseView, CreateView):
+#     """View to create a new film"""
+#
+# class FilmUpdateView(TicketBaseView, UpdateView):
+#     """View to update a film"""
+#
+# class FilmDeleteView(FilmBaseView, DeleteView):
+#     """View to delete a film"""
 

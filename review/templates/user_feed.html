@@ -7,7 +7,7 @@
     </div>
     <h2>Vos derniers posts</h2>
     <div class="feed">
-        {% for instance in posts %}
+        {% for instance in posts_paged %}
             {% if instance|model_type == 'Ticket' %}
                 {% include 'ticket/ticket_snippet.html' with ticket=instance %}
             {% elif instance|model_type == 'Review' %}
@@ -16,4 +16,5 @@
 
         {% endfor %}
     </div>
+    {% include 'partials\page_navigator.html' %}
 {% endblock content %}
