@@ -23,9 +23,20 @@ class Ticket(models.Model):
         super().save(*args, **kwargs)
         self.resize_image()
 
-    def review_done(self, *args, **kwargs):
+    def review_done(self):
         self.review_associated = True
 
+    def get_fields(self):
+        return [(field.verbose_name, field.value_from_object(self))
+
+                # if field.verbose_name != 'genre'
+                #
+                # else
+                # (field.verbose_name,
+                #  Genre.objects.get(pk=field.value_from_object(self)).name)
+
+                for field in self.__class__._meta.fields[1:]
+                ]
 
 class Review(models.Model):
     ticket = models.ForeignKey(to=Ticket, on_delete=models.CASCADE, null=True, blank=True)
@@ -35,13 +46,8 @@ class Review(models.Model):
     body = models.TextField(max_length=8192, blank=True)
     time_created = models.DateTimeField(auto_now_add=True)
     starred = models.BooleanField(default=False)
-    word_count = models.IntegerField(null=True)
-
-    def _get_word_count(self):
-        return len(self.body.split(' '))
 
     def save(self, *args, **kwargs):
-        self.word_count = self._get_word_count()
         self.ticket.review_associated = False
         super().save(*args, **kwargs)
 
@@ -55,3 +61,4 @@ class UserFollows(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+
