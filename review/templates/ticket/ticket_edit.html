@@ -5,14 +5,23 @@
     <form method="post">
         {{ edit_form.as_p }}
         {% csrf_token %}
-        <img src="{{ ticket.image.url }}">
+
+        {% if ticket.review_associated == False %}
+            <div class="review-button">
+                <a href="{% url 'review_on_existing_ticket' ticket.id %}"><button>Créer une critique</button></a>
+            </div>
+        {% endif %}
+        <div class = "edit-button">
         <button type="submit" >Sauvegarder</button>
+        </div>
     </form>
+
+        <hr>
     <h3>Supprimer le billet ?</h3>
-    <form method="post">
-        {{ delete_form }}
-        {% csrf_token %}
-        <button type="submit" >Supprimer</button>
-    </form>
+       {% if user == ticket.user %}
+            <div class = "edit-button">
+                <a href="{% url 'ticket_delete' ticket.id %}"><button>Supprimer</button></a>
+            </div>
+        {% endif %}
 </div>
 {% endblock content %}

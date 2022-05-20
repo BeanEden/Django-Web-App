@@ -27,8 +27,9 @@ class DeleteBlogForm(forms.Form):
     delete_blog = forms.BooleanField(widget=forms.HiddenInput, initial=True)
 
 
-class UserFollowsForm(forms.ModelForm):
-
-    class Meta:
-        model = User
-        fields = ['abonnements']
+# class UserFollowsForm(forms.ModelForm):
+#     edit_blog = forms.BooleanField(widget=forms.HiddenInput, initial=True)
+#
+#     class Meta:
+#         model = User
+#         fields = ['abonnements']

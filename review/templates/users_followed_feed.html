@@ -1,17 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
     <h2>Suivre des utilisateurs</h2>
+    <h3>S'abonner à un utilisateur</h3>
         <form method="post">
         <input type = 'text' name='query'/>
         <input type = 'submit' />
         {% csrf_token %}
         </form>
-    <form method="post" enctype="multipart/form-data">
-        {{ form.as_p }}
-        {{ followed_form.as_p }}
-        {% csrf_token %}
-        <button type="submit" >Confirmer</button>
-    </form>
+    <p>{{ error_message }}</p>
     <h3>Abonnements</h3>
     <p></p>
     {% for follow in users_followed %}
@@ -25,8 +21,4 @@
         {% include 'follower_snippet.html'%}
         {% endif %}
     {% endfor %}
-{#    {% for user_followed in followed %}#}
-{#     <p>1</p>#}
-{#    {% endfor %}#}
-
 {% endblock content %}

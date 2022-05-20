@@ -35,45 +35,38 @@ urlpatterns = [
         template_name = 'home.html'
     ), name='home'),
     path('follow_users/', review.views.follow_users, name='follow_users'),
-    path('followed_feed/', review.views.FollowedFeed.as_view(
-        template_name='followed_feed.html'
-    ), name='followed_feed'),
+    path('followed_feed/', review.views.FollowedFeed.as_view(), name='followed_feed'),
     path('user_feed/', review.views.GlobalFeed.as_view(
          template_name = 'user_feed.html'), name='user_feed'),
     path('users_followed_feed/', review.views.users_followed_feed, name='users_followed_feed'),
-    # path('user_delete/<int:user_follows_id>/', review.views.user_delete, name='user_delete'),
+    path('user_delete/<int:user_follows_id>/', review.views.user_delete, name='user_delete'),
 
-    path('ticket/create/', review.views.TicketCreateView.as_view(
-        template_name = 'ticket/ticket_create.html'),
-         name='ticket_create'),
-    path('ticket/<int:ticket_id>/edit/', review.views.TicketViewAndEdit.as_view(
-        template_name='ticket/ticket_edit.html'),
-         name='ticket_edit'),
-    path('ticket/<int:ticket_id>/delete/', review.views.DeleteView.as_view(
-        template_name = 'ticket/ticket_delete.html'),
-         name='ticket_delete'),
-    path('ticket/<int:ticket_id>/', review.views.TicketViewAndEdit.as_view(
-        template_name = 'ticket/ticket_view.html'),
-        name='ticket_view'),
-    path('ticket_feed/', review.views.GlobalFeed.as_view(
+
+    ##########  TICKET ###########
+    path('ticket/create/', review.views.ticket_create,name='ticket_create'),
+    path('ticket/<int:ticket_id>/', review.views.ticket_view, name='ticket_view'),
+    path('ticket/<int:ticket_id>/edit/', review.views.ticket_edit,name='ticket_edit'),
+    path('ticket/<int:ticket_id>/delete/', review.views.ticket_delete,name='ticket_delete'),
+
+    ##########  TICKET FEED ###########
+    path('ticket_feed/', review.views.TicketListView.as_view(
              template_name = 'ticket/ticket_feed.html'), name='ticket_feed'),
-    path('ticket_unchecked_feed/', review.views.GlobalFeed.as_view(
+    path('ticket_unchecked_feed/', review.views.TicketListView.as_view(
              template_name = 'ticket/ticket_unchecked_feed.html'), name='ticket_unchecked_feed'),
-#
-    path('review/create_with_ticket/', review.views.ReviewCreate.as_view(
-        template_name = 'review/review_and_ticket_creation.html'), name='review_and_ticket_creation'),
-    path('review/on_<int:ticket_id>/', review.views.ReviewCreate.as_view(
-        template_name = 'review/review_on_existing_ticket.html'), name='review_on_existing_ticket'),
-    path('review/<int:review_id>/edit', review.views.ReviewViewAndEdit.as_view(
-            template_name = 'review/review_edit.html'),
-            name='review_edit'),
-    path('review/<int:review_id>', review.views.ReviewViewAndEdit.as_view(
+
+    ##########  REVIEW ###########
+    path('review/create_with_ticket/', review.views.review_and_ticket_creation, name='review_and_ticket_creation'),
+    path('review/on_<int:ticket_id>/', review.views.review_on_existing_ticket, name='review_on_existing_ticket'),
+    path('review/<int:review_id>/edit', review.views.review_edit, name='review_edit'),
+    path('review/<int:review_id>', review.views.ReviewView.as_view(
                 template_name = 'review/review_view.html'),
                 name='review_view'),
-  path('review/<int:review_id>/delete/', review.views.DeleteView.as_view(
-            template_name = 'review/review_delete.html'),
+    path('review/<int:review_id>/delete/', review.views.review_delete,
              name='review_delete'),
-    path('review_feed/', review.views.GlobalFeed.as_view(
+
+
+    ##########  TICKET FEED ###########
+    path('review_feed/', review.views.ReviewListView.as_view(
              template_name = 'review/review_feed.html'), name='review_feed'),
 #
 #     path('profile/', review.views.ProfileTemplateView.as_view(template_name='profile.html'), name='profile'),

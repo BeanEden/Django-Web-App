@@ -52,6 +52,7 @@ class Review(models.Model):
         super().save(*args, **kwargs)
 
 
+
 class UserFollows(models.Model):
     user = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='following')
     followed_user = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='followed_by')
@@ -62,4 +63,4 @@ class UserFollows(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
-    # def create
+    # def save_new(self, *args,):

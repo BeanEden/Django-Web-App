@@ -2,8 +2,9 @@
 {% block content %}
     <h2>Derniers tickets</h2>
     <div class="grid-container">
-    {% for ticket in tickets_paged %}
+    {% for ticket in page_obj %}
         {% include 'ticket/ticket_snippet.html' with ticket=ticket %}
+
     {% endfor %}
     </div>
 {% include 'partials\page_navigator.html' %}

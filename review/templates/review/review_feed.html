@@ -3,7 +3,7 @@
 {% block content %}
     <h2>Dernières critiques</h2>
     <div class="grid-container">
-    {% for review in reviews_paged %}
+    {% for review in page_obj %}
         {% include 'review/review_snippet.html' with review=review %}
     {% endfor %}
     </div>
