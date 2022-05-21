@@ -5,6 +5,8 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class Ticket(models.Model):
+    """Ticket class, can be associated to a review
+    It is managed through TicketForm"""
     titre = models.CharField(max_length=128)
     description = models.TextField(max_length=2048, blank=True)
     user = models.ForeignKey(to=settings.AUTH_USER_MODEL,
@@ -17,6 +19,7 @@ class Ticket(models.Model):
     IMAGE_MAX_SIZE = (800, 800)
 
     def resize_image(self):
+        """resize_image before saving in order to preserve database memory"""
         image = Image.open(self.image)
         image.thumbnail(self.IMAGE_MAX_SIZE)
         image.save(self.image.path)
@@ -25,11 +28,10 @@ class Ticket(models.Model):
         super().save(*args, **kwargs)
         self.resize_image()
 
-    def review_done(self):
-        self.review_associated = True
-
 
 class Review(models.Model):
+    """Review class, always linked to a ticket
+    It is managed through ReviewForm"""
     ticket = models.ForeignKey(to=Ticket, on_delete=models.CASCADE,
                                null=True, blank=True)
     rating = models.PositiveSmallIntegerField(
@@ -47,6 +49,10 @@ class Review(models.Model):
 
 
 class UserFollows(models.Model):
+    """relationship between two users (followed/following)
+    linked in ManytoManyfield to User.subscriptions
+    (list of all people followed by the user)"""
+
     user = models.ForeignKey(
         to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
         related_name='following')

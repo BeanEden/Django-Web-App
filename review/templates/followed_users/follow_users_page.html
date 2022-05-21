@@ -7,7 +7,7 @@
         <input type = 'submit' />
         {% csrf_token %}
         </form>
-    <p>{{ error_message }}</p>
+    {{ form }}
     <h3>Abonnements</h3>
     <p></p>
     {% for follow in users_followed %}

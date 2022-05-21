@@ -33,10 +33,8 @@ urlpatterns = [
 
     # --------------------------HOME AND USER PAGES--------------------------#
 
-    path('home/', review.views.GlobalFeed.as_view(
-        template_name='home.html'), name='home'),
-    path('user_feed/', review.views.GlobalFeed.as_view(
-        template_name='user_feed.html'), name='user_feed'),
+    path('home/', review.views.GlobalFeed.as_view(), name='home'),
+    path('user_feed/', review.views.UserFeed.as_view(), name='user_feed'),
     path('profile-photo/upload', upload_profile_photo,
          name='upload_profile_photo'),
 
@@ -48,10 +46,12 @@ urlpatterns = [
     path('ticket/<int:ticket_id>/delete/', review.views.ticket_delete,
          name='ticket_delete'),
     path('ticket_feed/', review.views.TicketListView.as_view(
-             template_name='ticket/ticket_feed.html'), name='ticket_feed'),
+             template_name='ticket/ticket_feed.html'),
+         name='ticket_feed'),
     path('ticket_unchecked_feed/', review.views.TicketListView.as_view(
              template_name='ticket/ticket_unchecked_feed.html'),
          name='ticket_unchecked_feed'),
+    path('ticket/<int:ticket>/', review.views.ticket_view, name='ticket_view'),
 
 
     # -----------------------------REVIEW PAGES-----------------------------#
@@ -64,8 +64,10 @@ urlpatterns = [
          name='review_edit'),
     path('review/<int:review_id>/delete/', review.views.review_delete,
          name='review_delete'),
-    path('review_feed/', review.views.ReviewListView.as_view(
-             template_name='review/review_feed.html'), name='review_feed'),
+    path('review_feed/', review.views.ReviewListView.as_view(),
+         name='review_feed'),
+    path('review/<int:review_id>/', review.views.review_view,
+         name='review_view'),
 
 
     # -------------------------FOLLOWED USERS PAGES-------------------------#

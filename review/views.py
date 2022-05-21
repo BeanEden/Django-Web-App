@@ -11,8 +11,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from django.views.generic.list import ListView
 
-from django.urls import reverse_lazy
-
 from . import forms, models
 
 
@@ -22,9 +20,15 @@ User = get_user_model()
 # -----------------------------MIXINS-----------------------------#
 
 class PaginatedViewMixin:
+    """Mixin to paginate feeds class"""
 
     @staticmethod
     def paginate_view(request, object_paginated):
+        """Method to paginate feed
+
+        arguments: request, post _lit (ex: list of reviews)
+        return: post_list paginated"""
+
         paginator = Paginator(object_paginated, 6)
         page = request.GET.get('page')
         try:
@@ -39,9 +43,16 @@ class PaginatedViewMixin:
 # ---------------------------HOME AND USER PAGES---------------------------#
 
 class GlobalFeed(LoginRequiredMixin, View, PaginatedViewMixin):
-    template_name = ''
+    """Class view used to generate a paginated list of all tickets and reviews
+    ordered chronologically (soonest first)
+    """
+    template_name = 'home.html'
 
     def get(self, request):
+        """
+        argument: GET request
+        return: url + page_object (= paginated posts)
+        """
         reviews = models.Review.objects.all()
         tickets = models.Ticket.objects.all()
         posts_paged = self.paginate_view(
@@ -51,20 +62,40 @@ class GlobalFeed(LoginRequiredMixin, View, PaginatedViewMixin):
                       context={'page_obj': posts_paged})
 
 
+class UserFeed(LoginRequiredMixin, View, PaginatedViewMixin):
+    """Class view used to generate a paginated list of the logged user
+        tickets and reviews
+        """
+    template_name = 'user_feed.html'
+
+    def get(self, request):
+        """
+        argument: GET request
+        return: url + page_object (= paginated posts)
+        """
+        reviews = models.Review.objects.filter(user_id=request.user)
+        tickets = models.Ticket.objects.filter(user_id=request.user)
+        posts_paged = self.paginate_view(
+            request, sorted(chain(reviews, tickets),
+                            key=lambda x: x.time_created, reverse=True))
+        return render(request, self.template_name,
+                      context={'page_obj': posts_paged})
+
+
 # -----------------------------TICKET-----------------------------#
 
-class TicketBaseView(LoginRequiredMixin, View):
-    model = models.Ticket
-    form_class = forms.TicketForm
-    success_url = reverse_lazy('home')
-
-
-class TicketListView(ListView, TicketBaseView, PaginatedViewMixin):
+class TicketListView(ListView, PaginatedViewMixin):
+    """Generic ClassBasedView used to generate a paginated list of all tickets
+       actually used on ticket_feed.html and ticket_unchecked_feed.html
+        """
     model = models.Ticket
     template_name = ''
-    answered_tickets = False
 
     def get_context_data(self, **kwargs):
+        """
+        argument: GET request
+        return: url + page_object (= paginated posts)
+        """
         context = super().get_context_data(**kwargs)
         tickets = self.get_queryset().order_by('time_created').reverse()
         tickets_paged = self.paginate_view(self.request, tickets)
@@ -74,6 +105,12 @@ class TicketListView(ListView, TicketBaseView, PaginatedViewMixin):
 
 @login_required
 def ticket_create(request):
+    """Create ticket through TicketForm
+
+    argument: request
+    return: GET: url + form
+            POST: a new ticket saved """
+
     form = forms.TicketForm()
     if request.method == 'POST':
         form = forms.TicketForm(request.POST, request.FILES)
@@ -87,6 +124,12 @@ def ticket_create(request):
 
 @login_required
 def ticket_edit(request, ticket_id):
+    """Edit ticket through TicketForm
+
+    argument: request + ticket_id to edit
+    return: GET: url + ticket_object + TicketForm
+            POST: edited ticket saved """
+
     ticket = get_object_or_404(models.Ticket, id=ticket_id)
     edit_form = forms.TicketForm(instance=ticket)
     if request.method == 'POST':
@@ -100,6 +143,12 @@ def ticket_edit(request, ticket_id):
 
 @login_required
 def ticket_delete(request, ticket_id):
+    """Delete ticket through DeleteForm
+
+    argument: request + ticket_id to delete
+    return: GET: url + ticket_object + DeleteForm
+            POST: delete ticket """
+
     ticket = get_object_or_404(models.Ticket, id=ticket_id)
     delete_form = forms.DeleteBlogForm()
     if request.method == 'POST':
@@ -112,6 +161,11 @@ def ticket_delete(request, ticket_id):
 
 @login_required
 def ticket_view(request, ticket_id):
+    """View ticket selected
+
+        argument: request + ticket_id to view
+        return: GET: url + ticket_object """
+
     ticket = get_object_or_404(models.Ticket, id=ticket_id)
     return render(request, 'ticket/ticket_view.html',
                   context={'ticket': ticket})
@@ -119,17 +173,17 @@ def ticket_view(request, ticket_id):
 
 # -----------------------------REVIEW-----------------------------#
 
-class ReviewBaseView(LoginRequiredMixin, View):
+class ReviewListView(ListView, PaginatedViewMixin):
+    """Generic ClassBasedView used to generate a paginated list of all reviews
+        """
     model = models.Review
-    form_class = forms.ReviewForm
-    success_url = reverse_lazy('home')
-
-
-class ReviewListView(ListView, ReviewBaseView, PaginatedViewMixin):
-    model = models.Review
-    template_name = ''
+    template_name = 'review/review_feed.html'
 
     def get_context_data(self, **kwargs):
+        """
+        argument: GET request
+        return : url + page_object (= paginated posts)
+        """
         context = super(ReviewListView, self).get_context_data(**kwargs)
         reviews = self.get_queryset().order_by('time_created').reverse()
         reviews_paged = self.paginate_view(self.request, reviews)
@@ -139,6 +193,14 @@ class ReviewListView(ListView, ReviewBaseView, PaginatedViewMixin):
 
 @login_required
 def review_and_ticket_creation(request):
+    """Create a review without a ticket base
+    create both review and ticket through ReviewFrom and TicktForm
+
+    argument : request
+    return: GET: url + ReviewForm + TicketForm
+            POST: a new ticket saved + new request saved
+                + adding a review_associated to the ticket"""
+
     review_form = forms.ReviewForm()
     ticket_form = forms.TicketForm()
     if request.method == 'POST':
@@ -147,7 +209,7 @@ def review_and_ticket_creation(request):
         if all([review_form.is_valid(), ticket_form.is_valid()]):
             ticket = ticket_form.save(commit=False)
             ticket.user = request.user
-            ticket.review_done()
+            ticket.review_associated = True
             ticket.save()
             review = review_form.save(commit=False)
             review.user = request.user
@@ -164,6 +226,13 @@ def review_and_ticket_creation(request):
 
 @login_required
 def review_on_existing_ticket(request, ticket_id):
+    """Create a review on a ticket base, through ReviewFrom
+
+    argument: request
+    return: GET: url + ReviewForm + ticket_object
+            POST: a new request saved
+                + adding a review_associated to the ticket"""
+
     review_form = forms.ReviewForm()
     ticket = get_object_or_404(models.Ticket, id=ticket_id)
     if request.method == 'POST':
@@ -186,6 +255,12 @@ def review_on_existing_ticket(request, ticket_id):
 
 @login_required
 def review_edit(request, review_id):
+    """Edit a review through ReviewForm
+
+    argument: request + review_id to edit
+    return: GET: url + review_object + ReviewForm
+            POST: edited review saved """
+
     review = get_object_or_404(models.Review, id=review_id)
     edit_form = forms.ReviewForm(instance=review)
     if request.method == 'POST':
@@ -199,6 +274,14 @@ def review_edit(request, review_id):
 
 @login_required
 def review_delete(request, review_id):
+    """Delete review through DeleteForm
+    Does not delete the ticket associated
+
+    argument: request + review to delete
+    return: GET: url + review_object + DeleteForm
+            POST: delete review
+            + unchecking review_associated to the ticket"""
+
     review = get_object_or_404(models.Review, id=review_id)
     delete_form = forms.DeleteBlogForm()
     if request.method == 'POST':
@@ -210,11 +293,35 @@ def review_delete(request, review_id):
     return render(request, 'review/review_delete.html', context=context)
 
 
+@login_required
+def review_view(request, review_id):
+    """View review selected
+
+        argument: request + review_object to view
+        return: GET: url + review_object """
+
+    review = get_object_or_404(models.Review, id=review_id)
+    return render(request, 'review/review_view.html',
+                  context={'review': review})
+
 # -----------------------------FOLLOWED USERS-----------------------------#
 
 
 @login_required
 def follow_users_page(request):
+    """View with :
+        - a submit button to follow an existing user
+        - a followed users list (with a button to unfollow for each)
+        - a following users list
+
+        users_followed and following_users are treated through
+        UserFollows object (relation between two users with their id), linked
+        to User.subscriptions
+
+        argument: request
+        return: GET: url + all users_followed_object
+                POST: add a followed user (create a UserFollows)"""
+
     if request.method == 'POST':
         for values in User.objects.all():
             if request.POST['query'] == values.username:
@@ -234,9 +341,18 @@ def follow_users_page(request):
 
 @login_required
 def user_unfollow_page(request, user_follows_id):
+    """Followed_user view with an "unfollow option" (DeleteForm)
+    and all posts related to this user
+
+    argument: request, followed_user_id
+    return: GET: url + user_followed_object + posts of this user + DeleteFrom
+            POST: unfollow the user (delete the UserFollows object)"""
+
     user_followed = get_object_or_404(models.UserFollows, id=user_follows_id)
-    reviews = models.Review.objects.all()
-    tickets = models.Ticket.objects.all()
+    reviews = models.Review.objects.filter(
+        user_id=user_followed.followed_user_id)
+    tickets = models.Ticket.objects.filter(
+        user_id=user_followed.followed_user_id)
     posts_paged = sorted(chain(reviews, tickets),
                          key=lambda x: x.time_created, reverse=True)
     delete_form = forms.DeleteBlogForm()
@@ -250,13 +366,20 @@ def user_unfollow_page(request, user_follows_id):
 
 
 class FollowedFeed(LoginRequiredMixin, View, PaginatedViewMixin):
+    """Class view used to generate a paginated list of all followed_users
+    tickets and reviews, ordered chronologically (soonest first)
+        """
     template_name = 'followed_users/followed_feed.html'
 
     def get(self, request):
+        """
+        argument: GET request
+        return: url + page_object (= paginated posts)
+        """
         reviews = models.Review.objects.filter(
-            user__in=request.user.abonnements.all())
+            user__in=request.user.subscriptions.all())
         tickets = models.Ticket.objects.filter(
-            user__in=request.user.abonnements.all())
+            user__in=request.user.subscriptions.all())
         posts_paged = self.paginate_view(
             request, sorted(chain(reviews, tickets),
                             key=lambda x: x.time_created, reverse=True))

@@ -15,7 +15,7 @@ class TicketForm(forms.ModelForm):
 
 
 class ReviewForm(forms.ModelForm):
-    edit_blog = forms.BooleanField(widget=forms.HiddenInput, initial=True)
+    """rating field is edited to match wireframes"""
     rating = forms.ChoiceField(choices=CHOICES, widget=forms.RadioSelect)
 
     class Meta:
