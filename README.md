@@ -16,9 +16,9 @@ Application web "LITReview" permettant à une communauté d'utilisateurs de cons
 ## Utilisation :
 
 ### 1 - Télécharger le dossier.zip :
-Installez les élements dans le dossier de votre choix
+Installez les éléments dans le dossier de votre choix
 
-### 2 - Créez un environement virtuel dans votre dossier et activez le :
+### 2 - Créez un environnement virtuel dans votre dossier et activez le :
 * Commande terminal : `cd path/to/selected/project/directory`
 * Commande terminal : `python -m venv env`
 * Commande terminal : `env/Scripts/activate.bat` (sous Windows)
