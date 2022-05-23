@@ -28,7 +28,7 @@ Importez dans votre environnement virtuel les packages nécessaires à l'applica
 * Commande terminal : `pip install -r requirements.txt`
 
 ### 4 - Vérifiez les migrations : 
-Vérifiez que les migrations sont sont bien à jour
+Vérifiez que les migrations sont bien à jour
 * Commande terminal : `python manage.py makemigrations`
 * Commande terminal : `python manage.py migrate`
 
